@@ -12,20 +12,20 @@ function TreeNode({ node, style, dragHandle }) {
       ref={dragHandle}
       style={style}
       className={`
-        flex items-center justify-between pr-2 py-1 cursor-pointer
-        ${isSelected ? 'bg-gray-200' : 'hover:bg-gray-100'}
+        flex items-center justify-between px-2 py-2 rounded-md cursor-pointer transition-all duration-150
+        ${isSelected ? 'bg-primary-50 text-primary-700 shadow-elevation-1' : 'hover:bg-surface-100'}
       `}
       onClick={() => node.isInternal ? node.toggle() : node.select()}
     >
       <div className="flex items-center gap-1 min-w-0">
         {data.isDirectory ? (
-          <span className="text-gray-500 w-4 text-center">
+          <span className="text-surface-700 w-4 text-center text-xs">
             {node.isOpen ? '▼' : '▶'}
           </span>
         ) : (
           <span className="w-4" />
         )}
-        <span className={`truncate ${data.isDirectory ? 'font-medium' : ''}`}>
+        <span className={`truncate ${data.isDirectory ? 'font-semibold text-surface-900' : 'text-surface-900'}`}>
           {data.name}
         </span>
       </div>
@@ -36,8 +36,8 @@ function TreeNode({ node, style, dragHandle }) {
             e.stopPropagation()
             node.data.onDelete?.(data.id)
           }}
-          className="opacity-50 hover:opacity-100 text-gray-500 hover:text-red-600 p-1"
-          title="Elimina"
+          className="p-1 rounded text-surface-700 opacity-60 hover:opacity-100 hover:bg-danger-50 hover:text-danger-600 focus:outline-none focus:ring-2 focus:ring-danger-600 transition-all duration-200"
+          title="Delete"
         >
           🗑️
         </button>
@@ -118,7 +118,7 @@ export function Sidebar({ files, selectedFile, onSelectFile, onDeleteFile, onAdd
   }
 
   return (
-    <aside className="w-64 border-r border-gray-200 bg-gray-50 flex flex-col h-full">
+    <aside className="w-64 border-r border-surface-200 bg-surface-50 shadow-elevation-1 flex flex-col h-full">
       <div className="flex-1 overflow-auto p-2">
         <Tree
           ref={treeRef}
@@ -136,12 +136,12 @@ export function Sidebar({ files, selectedFile, onSelectFile, onDeleteFile, onAdd
         </Tree>
       </div>
 
-      <div className="p-2 border-t border-gray-200">
+      <div className="p-4 border-t border-surface-200 bg-surface-0">
         <button
           onClick={() => setShowAddDialog(true)}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded"
+          className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium text-surface-700 hover:bg-surface-100 hover:text-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 active:bg-surface-200 transition-all duration-200"
         >
-          <span>+ Aggiungi file</span>
+          <span>+ Add file</span>
         </button>
       </div>
 

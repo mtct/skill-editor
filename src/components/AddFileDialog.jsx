@@ -36,46 +36,46 @@ export function AddFileDialog({ isOpen, onClose, onAdd, existingDirs }) {
     .filter((v, i, a) => a.indexOf(v) === i) // unique
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
-        <h2 className="text-lg font-semibold mb-4">Aggiungi File</h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-[2px]">
+      <div className="bg-surface-0 rounded-lg shadow-elevation-4 p-6 w-full max-w-md transform transition-all duration-200">
+        <h2 className="text-lg font-semibold text-surface-900 mb-4">Add File</h2>
 
         <div className="space-y-4">
           {/* File selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Seleziona file
+            <label className="block text-sm font-medium text-surface-900 mb-2">
+              Select file
             </label>
             <input
               ref={fileInputRef}
               type="file"
               onChange={handleFileSelect}
-              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              className="block w-full text-sm text-surface-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary-50 file:text-primary-700 file:shadow-elevation-1 hover:file:bg-primary-500 hover:file:text-white hover:file:shadow-elevation-2 file:transition-all file:duration-200 file:cursor-pointer"
             />
           </div>
 
           {/* Path input */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Path di destinazione
+            <label className="block text-sm font-medium text-surface-900 mb-2">
+              Destination path
             </label>
             <input
               type="text"
               value={targetPath}
               onChange={(e) => setTargetPath(e.target.value)}
-              placeholder="es: scripts/helper.py o SKILL.md"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="e.g.: scripts/helper.py or SKILL.md"
+              className="w-full px-4 py-2 rounded-md border border-surface-200 bg-surface-0 text-base text-surface-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200"
             />
-            <p className="mt-1 text-xs text-gray-500">
-              Includi sottocartelle nel path (es: scripts/utils/helper.py)
+            <p className="mt-1 text-xs text-surface-700">
+              Include subfolders in path (e.g.: scripts/utils/helper.py)
             </p>
           </div>
 
           {/* Quick suggestions */}
           {suggestions.length > 0 && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Cartelle comuni
+              <label className="block text-sm font-medium text-surface-900 mb-2">
+                Common folders
               </label>
               <div className="flex flex-wrap gap-2">
                 {suggestions.slice(0, 6).map((dir) => (
@@ -88,7 +88,7 @@ export function AddFileDialog({ isOpen, onClose, onAdd, existingDirs }) {
                         setTargetPath(dir)
                       }
                     }}
-                    className="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded"
+                    className="px-3 py-1 rounded-md text-xs font-medium bg-surface-100 text-surface-900 shadow-elevation-1 hover:bg-primary-50 hover:text-primary-700 hover:shadow-elevation-2 focus:outline-none focus:ring-2 focus:ring-primary-500 active:scale-95 transition-all duration-200 cursor-pointer"
                   >
                     {dir}
                   </button>
@@ -102,20 +102,20 @@ export function AddFileDialog({ isOpen, onClose, onAdd, existingDirs }) {
         <div className="flex justify-end gap-2 mt-6">
           <button
             onClick={handleClose}
-            className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded"
+            className="px-4 py-2 rounded-md text-sm font-medium bg-surface-100 text-surface-900 shadow-elevation-1 hover:bg-surface-200 hover:shadow-elevation-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 active:scale-[0.98] transition-all duration-200"
           >
-            Annulla
+            Cancel
           </button>
           <button
             onClick={handleAdd}
             disabled={!selectedFile || !targetPath.trim()}
-            className={`px-4 py-2 text-sm text-white rounded ${
+            className={`px-4 py-2 rounded-md font-medium text-sm transition-all duration-200 ${
               selectedFile && targetPath.trim()
-                ? 'bg-blue-600 hover:bg-blue-700'
-                : 'bg-gray-300 cursor-not-allowed'
+                ? 'bg-primary-500 text-white shadow-elevation-2 hover:bg-primary-700 hover:shadow-elevation-3 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 active:scale-[0.98] active:shadow-elevation-1'
+                : 'bg-surface-100 text-surface-700 shadow-elevation-1 cursor-not-allowed opacity-60'
             }`}
           >
-            Aggiungi
+            Add
           </button>
         </div>
       </div>

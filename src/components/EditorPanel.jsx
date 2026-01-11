@@ -2,6 +2,7 @@ import { useEffect, useRef, useMemo } from 'react'
 import { EditorView, keymap, lineNumbers, highlightActiveLine } from '@codemirror/view'
 import { EditorState } from '@codemirror/state'
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
+import { syntaxHighlighting, defaultHighlightStyle } from '@codemirror/language'
 import { markdown } from '@codemirror/lang-markdown'
 import { yaml } from '@codemirror/lang-yaml'
 import { python } from '@codemirror/lang-python'
@@ -60,12 +61,14 @@ export function EditorPanel({ filePath, content, isBinary, onChange }) {
         history(),
         keymap.of([...defaultKeymap, ...historyKeymap]),
         getLanguageExtension(language),
+        syntaxHighlighting(defaultHighlightStyle),
         updateListener,
         EditorView.lineWrapping,
         EditorView.theme({
           '&': {
             height: '100%',
             fontSize: '14px',
+            backgroundColor: '#FFFFFF',
           },
           '.cm-scroller': {
             overflow: 'auto',
@@ -73,9 +76,19 @@ export function EditorPanel({ filePath, content, isBinary, onChange }) {
           },
           '.cm-content': {
             padding: '16px 0',
+            caretColor: '#2196F3',
           },
           '.cm-line': {
             padding: '0 16px',
+          },
+          '.cm-activeLine': {
+            backgroundColor: '#FAFAFA',
+          },
+          '.cm-selectionBackground': {
+            backgroundColor: '#E3F2FD !important',
+          },
+          '.cm-cursor': {
+            borderLeftColor: '#2196F3',
           },
         }),
       ],
@@ -114,8 +127,8 @@ export function EditorPanel({ filePath, content, isBinary, onChange }) {
   // No file selected
   if (!filePath) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-white text-gray-400">
-        Seleziona un file dalla sidebar
+      <div className="flex-1 flex items-center justify-center bg-surface-50 text-surface-700 text-base">
+        Select a file from the sidebar
       </div>
     )
   }
@@ -123,10 +136,10 @@ export function EditorPanel({ filePath, content, isBinary, onChange }) {
   // Binary file
   if (isBinary) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-white text-gray-500 gap-2">
-        <span className="text-4xl">📄</span>
-        <span className="font-medium">{getFileName(filePath)}</span>
-        <span className="text-sm">{MESSAGES.BINARY_FILE}</span>
+      <div className="flex-1 flex flex-col items-center justify-center gap-4 bg-surface-50 text-surface-700">
+        <span className="text-6xl">📄</span>
+        <span className="font-semibold text-lg text-surface-900">{getFileName(filePath)}</span>
+        <span className="text-sm text-surface-700">{MESSAGES.BINARY_FILE}</span>
       </div>
     )
   }
@@ -134,7 +147,7 @@ export function EditorPanel({ filePath, content, isBinary, onChange }) {
   return (
     <div
       ref={containerRef}
-      className="flex-1 overflow-hidden bg-white"
+      className="flex-1 overflow-hidden bg-surface-0"
     />
   )
 }

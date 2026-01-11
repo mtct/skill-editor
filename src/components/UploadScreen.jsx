@@ -39,7 +39,7 @@ export function UploadScreen({ onFileLoad, error }) {
   }, [handleFile])
 
   return (
-    <div className="h-screen flex items-center justify-center bg-gray-50 p-8">
+    <div className="h-screen flex items-center justify-center bg-surface-50 p-8">
       <div
         onClick={handleClick}
         onDrop={handleDrop}
@@ -49,19 +49,19 @@ export function UploadScreen({ onFileLoad, error }) {
           w-full max-w-2xl h-96
           flex flex-col items-center justify-center
           border-2 border-dashed rounded-2xl
-          cursor-pointer transition-colors duration-200
+          cursor-pointer transition-all duration-200
           ${isDragging
-            ? 'border-blue-500 bg-blue-50'
-            : 'border-gray-300 bg-white hover:border-gray-400 hover:bg-gray-50'
+            ? 'border-primary-500 bg-primary-50 shadow-elevation-3'
+            : 'border-surface-200 bg-surface-0 shadow-elevation-1 hover:border-primary-500 hover:bg-primary-50 hover:shadow-elevation-2'
           }
         `}
       >
-        <p className="text-xl font-medium text-gray-700 text-center px-4">
+        <p className="text-xl font-medium text-surface-900 text-center px-4">
           {MESSAGES.UPLOAD_TITLE}
         </p>
 
         {error && (
-          <p className="mt-4 text-red-600 text-sm text-center px-4">
+          <p className="mt-4 text-danger-600 text-sm text-center px-4 font-medium">
             {error}
           </p>
         )}
