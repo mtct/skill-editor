@@ -19,7 +19,7 @@
   "bugs": {
     "url": "https://github.com/mtct/skill-editor/issues"
   },
-  "homepage": "https://github.com/mtct/skill-editor#readme",
+  "homepage": "https://mtct.github.io/skill-editor/",
   "dependencies": {
     "@codemirror/commands": "^6.10.1",
     "@codemirror/lang-javascript": "^6.2.4",
