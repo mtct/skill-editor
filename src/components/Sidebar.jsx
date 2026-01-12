@@ -12,36 +12,38 @@ function TreeNode({ node, style, dragHandle }) {
       ref={dragHandle}
       style={style}
       className={`
-        flex items-center justify-between px-2 py-2 rounded-md cursor-pointer transition-all duration-150
+        flex items-center justify-between px-2 py-1.5 my-0.5 rounded-md cursor-pointer transition-all duration-150
         ${isSelected ? 'bg-primary-50 text-primary-700 shadow-elevation-1' : 'hover:bg-surface-100'}
       `}
       onClick={() => node.isInternal ? node.toggle() : node.select()}
     >
       <div className="flex items-center gap-1 min-w-0">
         {data.isDirectory ? (
-          <span className="text-surface-700 w-4 text-center text-xs">
+          <span className="text-surface-700 w-4 text-center text-xs leading-none">
             {node.isOpen ? '▼' : '▶'}
           </span>
         ) : (
           <span className="w-4" />
         )}
-        <span className={`truncate ${data.isDirectory ? 'font-semibold text-surface-900' : 'text-surface-900'}`}>
+        <span className={`truncate leading-tight ${data.isDirectory ? 'font-semibold text-surface-900' : 'text-surface-900'}`}>
           {data.name}
         </span>
       </div>
 
-      {canDelete && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation()
-            node.data.onDelete?.(data.id)
-          }}
-          className="p-1 rounded text-surface-700 opacity-60 hover:opacity-100 hover:bg-danger-50 hover:text-danger-600 focus:outline-none focus:ring-2 focus:ring-danger-600 transition-all duration-200"
-          title="Delete"
-        >
-          🗑️
-        </button>
-      )}
+      <div className="w-6 h-6 flex items-center justify-center flex-shrink-0">
+        {canDelete && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              node.data.onDelete?.(data.id)
+            }}
+            className="p-1 rounded text-surface-700 opacity-60 hover:opacity-100 hover:bg-danger-50 hover:text-danger-600 focus:outline-none focus:ring-2 focus:ring-danger-600 transition-all duration-200"
+            title="Delete"
+          >
+            🗑️
+          </button>
+        )}
+      </div>
     </div>
   )
 }
@@ -129,17 +131,17 @@ export function Sidebar({ files, selectedFile, onSelectFile, onDeleteFile, onAdd
           width="100%"
           height={600}
           indent={16}
-          rowHeight={32}
+          rowHeight={40}
           overscanCount={5}
         >
           {TreeNode}
         </Tree>
       </div>
 
-      <div className="p-4 border-t border-surface-200 bg-surface-0">
+      <div className="p-3 border-t border-surface-200 bg-surface-0">
         <button
           onClick={() => setShowAddDialog(true)}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium text-surface-700 hover:bg-surface-100 hover:text-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 active:bg-surface-200 transition-all duration-200"
+          className="w-full flex items-center justify-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium text-surface-700 hover:bg-surface-100 hover:text-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 active:bg-surface-200 transition-all duration-200"
         >
           <span>+ Add file</span>
         </button>

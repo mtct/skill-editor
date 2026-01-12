@@ -39,7 +39,11 @@ export function UploadScreen({ onFileLoad, error }) {
   }, [handleFile])
 
   return (
-    <div className="h-screen flex items-center justify-center bg-surface-50 p-8">
+    <div className="h-screen flex flex-col items-center justify-center bg-surface-50 p-8">
+      <h1 className="text-4xl font-bold text-surface-900 mb-8">
+        Claude Skill Editor
+      </h1>
+
       <div
         onClick={handleClick}
         onDrop={handleDrop}
