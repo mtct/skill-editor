@@ -46,14 +46,12 @@ export function AddFileDialog({ isOpen, onClose, onAdd, existingDirs }) {
             <label className="block text-sm font-medium text-surface-900 mb-2">
               Select file
             </label>
-            <div className="py-1">
-              <input
-                ref={fileInputRef}
-                type="file"
-                onChange={handleFileSelect}
-                className="block w-full text-sm text-surface-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary-50 file:text-primary-700 file:shadow-elevation-1 hover:file:bg-primary-500 hover:file:text-white hover:file:shadow-elevation-2 file:transition-all file:duration-200 file:cursor-pointer"
-              />
-            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              onChange={handleFileSelect}
+              className="block w-full my-2 py-2 text-sm text-surface-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary-50 file:text-primary-700 file:shadow-elevation-1 hover:file:bg-primary-500 hover:file:text-white hover:file:shadow-elevation-2 file:transition-all file:duration-200 file:cursor-pointer"
+            />
           </div>
 
           {/* Path input */}

@@ -18,6 +18,7 @@ function App() {
     addFile,
     deleteFile,
     saveSkill,
+    reset,
     clearErrors,
   } = useSkillState()
 
@@ -45,6 +46,7 @@ function App() {
       onAddFile={addFile}
       onDeleteFile={deleteFile}
       onSave={saveSkill}
+      onClose={reset}
       onClearErrors={clearErrors}
     />
   )

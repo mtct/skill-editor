@@ -16,6 +16,7 @@ export function SkillEditor({
   onAddFile,
   onDeleteFile,
   onSave,
+  onClose,
   onClearErrors,
 }) {
   // Get current file data
@@ -41,6 +42,7 @@ export function SkillEditor({
       <Header
         fileName={fileName}
         onSave={onSave}
+        onClose={onClose}
         isSaving={isSaving}
         isModified={isModified}
       />

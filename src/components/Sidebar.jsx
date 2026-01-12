@@ -4,8 +4,10 @@ import { buildFileTree, isSkillMd, isBinaryFile, getDirectory } from '../utils/f
 import { AddFileDialog } from './AddFileDialog'
 
 function TreeNode({ node, style, dragHandle }) {
-  const { data, isSelected } = node
+  const { data } = node
   const canDelete = !data.isDirectory && !isSkillMd(data.id)
+  // Check if this node is selected based on the data prop (which includes selectedFile)
+  const isSelected = data.isSelected
 
   return (
     <div
@@ -52,25 +54,26 @@ export function Sidebar({ files, selectedFile, onSelectFile, onDeleteFile, onAdd
   const treeRef = useRef(null)
   const [showAddDialog, setShowAddDialog] = useState(false)
 
-  // Build tree structure with delete handler attached
+  // Build tree structure with delete handler and selection state attached
   const treeData = useMemo(() => {
     const tree = buildFileTree(files)
 
-    // Attach delete handler to each node
-    const attachHandler = (nodes) => {
+    // Attach delete handler and selection state to each node
+    const attachData = (nodes) => {
       nodes.forEach(node => {
         node.onDelete = onDeleteFile
+        node.isSelected = !node.isDirectory && node.id === selectedFile
         if (node.children) {
-          attachHandler(node.children)
+          attachData(node.children)
         }
       })
     }
-    attachHandler(tree)
+    attachData(tree)
 
     return tree
-  }, [files, onDeleteFile])
+  }, [files, onDeleteFile, selectedFile])
 
-  // Handle selection
+  // Handle selection - only update if a file is selected, maintain current selection otherwise
   const handleSelect = (nodes) => {
     if (nodes.length > 0) {
       const node = nodes[0]
@@ -78,6 +81,7 @@ export function Sidebar({ files, selectedFile, onSelectFile, onDeleteFile, onAdd
         onSelectFile(node.id)
       }
     }
+    // Don't deselect if clicking outside - keep the current selection
   }
 
   // Extract existing directories for suggestions

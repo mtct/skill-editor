@@ -22,6 +22,12 @@ export const BINARY_EXTENSIONS = [
   'ttf', 'otf', 'woff', 'woff2', 'eot',
 ]
 
+// Image file extensions
+export const IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'ico']
+
+// PDF file extension
+export const PDF_EXTENSIONS = ['pdf']
+
 /**
  * Get file extension from path
  */
@@ -52,6 +58,39 @@ export function getDirectory(path) {
 export function isBinaryFile(path) {
   const ext = getExtension(path)
   return BINARY_EXTENSIONS.includes(ext)
+}
+
+/**
+ * Check if file is an image
+ */
+export function isImageFile(path) {
+  const ext = getExtension(path)
+  return IMAGE_EXTENSIONS.includes(ext)
+}
+
+/**
+ * Check if file is a PDF
+ */
+export function isPdfFile(path) {
+  const ext = getExtension(path)
+  return PDF_EXTENSIONS.includes(ext)
+}
+
+/**
+ * Get MIME type for image based on extension
+ */
+export function getImageMimeType(path) {
+  const ext = getExtension(path)
+  const mimeTypes = {
+    png: 'image/png',
+    jpg: 'image/jpeg',
+    jpeg: 'image/jpeg',
+    gif: 'image/gif',
+    webp: 'image/webp',
+    svg: 'image/svg+xml',
+    ico: 'image/x-icon',
+  }
+  return mimeTypes[ext] || 'image/png'
 }
 
 /**
