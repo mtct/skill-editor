@@ -32,7 +32,6 @@
     "js-yaml": "^4.1.1",
     "jszip": "^3.10.1",
     "react": "^19.2.3",
-    "react-arborist": "^3.4.3",
     "react-dom": "^19.2.3"
   },
   "devDependencies": {
