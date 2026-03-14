@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { Header } from './Header'
 import { Sidebar } from './Sidebar'
 import { EditorPanel } from './EditorPanel'
@@ -18,7 +18,11 @@ export function SkillEditor({
   onSave,
   onClose,
   onClearErrors,
+  theme,
+  onToggleTheme,
 }) {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+
   // Get current file data
   const currentFileData = selectedFile ? files[selectedFile] : null
 
@@ -38,22 +42,28 @@ export function SkillEditor({
   }, [onDeleteFile])
 
   return (
-    <div className="h-screen flex flex-col bg-white">
+    <div className="h-screen flex flex-col bg-surface-0">
       <Header
         fileName={fileName}
         onSave={onSave}
         onClose={onClose}
         isSaving={isSaving}
         isModified={isModified}
+        isSidebarOpen={isSidebarOpen}
+        onToggleSidebar={() => setIsSidebarOpen(v => !v)}
+        theme={theme}
+        onToggleTheme={onToggleTheme}
       />
 
-      <div className="flex-1 flex overflow-hidden">
+      <main className="flex-1 flex overflow-hidden">
         <Sidebar
           files={files}
           selectedFile={selectedFile}
           onSelectFile={onSelectFile}
           onDeleteFile={handleDelete}
           onAddFile={onAddFile}
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
         />
 
         <EditorPanel
@@ -62,7 +72,7 @@ export function SkillEditor({
           isBinary={currentFileData?.isBinary}
           onChange={handleContentChange}
         />
-      </div>
+      </main>
 
       <ValidationToast
         errors={validationErrors}

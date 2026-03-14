@@ -1,28 +1,54 @@
 @import "tailwindcss";
 
+/* Geist Sans — variable font */
+@font-face {
+  font-family: 'Geist';
+  src: url('../node_modules/geist/dist/fonts/geist-sans/Geist-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Geist Mono — variable font */
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('../node_modules/geist/dist/fonts/geist-mono/GeistMono-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+body {
+  font-family: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--color-surface-900);
+  background-color: var(--color-surface-0);
+}
+
 @theme {
-  /* Surface colors */
-  --color-surface-0: #FFFFFF;
-  --color-surface-50: #FAFAFA;
-  --color-surface-100: #F5F5F5;
-  --color-surface-200: #EEEEEE;
-  --color-surface-700: #616161;
-  --color-surface-900: #212121;
+  /* Surface colors — pure white base, neutrals tinted cool toward indigo */
+  --color-surface-0: oklch(99.7% 0.003 264);
+  --color-surface-50: oklch(98% 0.005 264);
+  --color-surface-100: oklch(96% 0.009 264);
+  --color-surface-200: oklch(91% 0.013 264);
+  --color-surface-700: oklch(47% 0.028 264);
+  --color-surface-900: oklch(19% 0.025 264);
 
-  /* Primary */
-  --color-primary-50: #E3F2FD;
-  --color-primary-500: #2196F3;
-  --color-primary-700: #1976D2;
+  /* Primary — Indigo (≈ #4F46E5 / Tailwind indigo-600) */
+  --color-primary-50: oklch(96% 0.032 264);
+  --color-primary-500: oklch(51% 0.224 264);
+  --color-primary-700: oklch(42% 0.196 264);
 
-  /* Success */
-  --color-success-50: #E8F5E9;
-  --color-success-600: #43A047;
-  --color-success-700: #388E3C;
+  /* Success — rich green (≈ #16A34A / Tailwind green-600) */
+  --color-success-50: oklch(98% 0.025 145);
+  --color-success-600: oklch(53% 0.155 145);
+  --color-success-700: oklch(47% 0.140 145);
 
-  /* Danger */
-  --color-danger-50: #FFEBEE;
-  --color-danger-600: #E53935;
-  --color-danger-700: #D32F2F;
+  /* Danger — crisp red (≈ #DC2626 / Tailwind red-600) */
+  --color-danger-50: oklch(97% 0.020 27);
+  --color-danger-600: oklch(53% 0.200 27);
+  --color-danger-700: oklch(45% 0.175 27);
 
   /* Elevation shadows */
   --shadow-elevation-1: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
@@ -30,4 +56,77 @@
   --shadow-elevation-3: 0 10px 20px rgba(0,0,0,0.15), 0 3px 6px rgba(0,0,0,0.10);
   --shadow-elevation-4: 0 15px 25px rgba(0,0,0,0.15), 0 5px 10px rgba(0,0,0,0.05);
   --shadow-elevation-8: 0 20px 40px rgba(0,0,0,0.20);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    /* Nord Polar Night — surfaces */
+    --color-surface-0:   oklch(25% 0.015 243);
+    --color-surface-50:  oklch(30% 0.020 243);
+    --color-surface-100: oklch(34% 0.022 243);
+    --color-surface-200: oklch(39% 0.025 243);
+    --color-surface-700: oklch(66% 0.075 236);
+    --color-surface-900: oklch(95% 0.007 243);
+    --color-primary-50:  oklch(28% 0.035 228);
+    --color-primary-500: oklch(75% 0.068 215);
+    --color-primary-700: oklch(84% 0.052 215);
+    --color-success-50:  oklch(28% 0.030 130);
+    --color-success-600: oklch(74% 0.088 130);
+    --color-success-700: oklch(80% 0.072 130);
+    --color-danger-50:   oklch(24% 0.038 18);
+    --color-danger-600:  oklch(60% 0.118 18);
+    --color-danger-700:  oklch(67% 0.102 18);
+    --shadow-elevation-1: 0 1px 3px rgba(0,0,0,0.40), 0 1px 2px rgba(0,0,0,0.50);
+    --shadow-elevation-2: 0 3px 6px rgba(0,0,0,0.45), 0 2px 4px rgba(0,0,0,0.40);
+    --shadow-elevation-3: 0 10px 20px rgba(0,0,0,0.50), 0 3px 6px rgba(0,0,0,0.35);
+    --shadow-elevation-4: 0 15px 25px rgba(0,0,0,0.50), 0 5px 10px rgba(0,0,0,0.25);
+    --shadow-elevation-8: 0 20px 40px rgba(0,0,0,0.60);
+  }
+}
+
+/* Explicit dark override — user preference beat system preference */
+:root[data-theme="dark"] {
+    --color-surface-0:   oklch(25% 0.015 243);
+    --color-surface-50:  oklch(30% 0.020 243);
+    --color-surface-100: oklch(34% 0.022 243);
+    --color-surface-200: oklch(39% 0.025 243);
+    --color-surface-700: oklch(66% 0.075 236);
+    --color-surface-900: oklch(95% 0.007 243);
+    --color-primary-50:  oklch(28% 0.035 228);
+    --color-primary-500: oklch(75% 0.068 215);
+    --color-primary-700: oklch(84% 0.052 215);
+    --color-success-50:  oklch(28% 0.030 130);
+    --color-success-600: oklch(74% 0.088 130);
+    --color-success-700: oklch(80% 0.072 130);
+    --color-danger-50:   oklch(24% 0.038 18);
+    --color-danger-600:  oklch(60% 0.118 18);
+    --color-danger-700:  oklch(67% 0.102 18);
+    --shadow-elevation-1: 0 1px 3px rgba(0,0,0,0.40), 0 1px 2px rgba(0,0,0,0.50);
+    --shadow-elevation-2: 0 3px 6px rgba(0,0,0,0.45), 0 2px 4px rgba(0,0,0,0.40);
+    --shadow-elevation-3: 0 10px 20px rgba(0,0,0,0.50), 0 3px 6px rgba(0,0,0,0.35);
+    --shadow-elevation-4: 0 15px 25px rgba(0,0,0,0.50), 0 5px 10px rgba(0,0,0,0.25);
+    --shadow-elevation-8: 0 20px 40px rgba(0,0,0,0.60);
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.dialog-enter {
+  animation: dialog-in 180ms cubic-bezier(0, 0, 0.2, 1) both;
 }

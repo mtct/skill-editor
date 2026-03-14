@@ -1,8 +1,20 @@
+import { lazy, Suspense } from 'react'
 import { useSkillState } from './hooks/useSkillState'
+import { useTheme } from './hooks/useTheme'
 import { UploadScreen } from './components/UploadScreen'
-import { SkillEditor } from './components/SkillEditor'
+
+const SkillEditor = lazy(() =>
+  import('./components/SkillEditor').then(m => ({ default: m.SkillEditor }))
+)
+
+// Preload editor bundle in the background after first paint
+// so it's ready by the time the user loads a .skill file
+if (typeof window !== 'undefined') {
+  setTimeout(() => import('./components/SkillEditor'), 500)
+}
 
 function App() {
+  const { theme, toggleTheme } = useTheme()
   const {
     appState,
     fileName,
@@ -28,13 +40,16 @@ function App() {
       <UploadScreen
         onFileLoad={loadSkill}
         error={loadError}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
     )
   }
 
   // Editor screen
   return (
-    <SkillEditor
+    <Suspense fallback={null}>
+      <SkillEditor
       fileName={fileName}
       files={files}
       selectedFile={selectedFile}
@@ -47,8 +62,11 @@ function App() {
       onDeleteFile={deleteFile}
       onSave={saveSkill}
       onClose={reset}
+      theme={theme}
+      onToggleTheme={toggleTheme}
       onClearErrors={clearErrors}
     />
+    </Suspense>
   )
 }
 

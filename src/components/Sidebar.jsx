@@ -1,96 +1,34 @@
-import { useMemo, useRef, useState } from 'react'
-import { Tree } from 'react-arborist'
-import { buildFileTree, isSkillMd, isBinaryFile, getDirectory } from '../utils/fileUtils'
+import { useCallback, useMemo, useState } from 'react'
+import { isSkillMd, isBinaryFile, getFileName, getDirectory, sortFiles } from '../utils/fileUtils'
 import { AddFileDialog } from './AddFileDialog'
+import { MESSAGES } from '../constants/messages'
 
-function TreeNode({ node, style, dragHandle }) {
-  const { data } = node
-  const canDelete = !data.isDirectory && !isSkillMd(data.id)
-  // Check if this node is selected based on the data prop (which includes selectedFile)
-  const isSelected = data.isSelected
-
-  return (
-    <div
-      ref={dragHandle}
-      style={style}
-      className={`
-        flex items-center justify-between px-2 py-1.5 my-0.5 rounded-md cursor-pointer transition-all duration-150
-        ${isSelected ? 'bg-primary-50 text-primary-700 shadow-elevation-1' : 'hover:bg-surface-100'}
-      `}
-      onClick={() => node.isInternal ? node.toggle() : node.select()}
-    >
-      <div className="flex items-center gap-1 min-w-0">
-        {data.isDirectory ? (
-          <span className="text-surface-700 w-4 text-center text-xs leading-none">
-            {node.isOpen ? '▼' : '▶'}
-          </span>
-        ) : (
-          <span className="w-4" />
-        )}
-        <span className={`truncate leading-tight ${data.isDirectory ? 'font-semibold text-surface-900' : 'text-surface-900'}`}>
-          {data.name}
-        </span>
-      </div>
-
-      <div className="w-6 h-6 flex items-center justify-center flex-shrink-0">
-        {canDelete && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              node.data.onDelete?.(data.id)
-            }}
-            className="p-1 rounded text-surface-700 opacity-60 hover:opacity-100 hover:bg-danger-50 hover:text-danger-600 focus:outline-none focus:ring-2 focus:ring-danger-600 transition-all duration-200"
-            title="Delete"
-          >
-            🗑️
-          </button>
-        )}
-      </div>
-    </div>
-  )
+function groupByDir(files) {
+  const sorted = sortFiles(Object.keys(files))
+  const groups = {}
+  sorted.forEach(path => {
+    const dir = getDirectory(path) || ''
+    if (!groups[dir]) groups[dir] = []
+    groups[dir].push(path)
+  })
+  return groups
 }
 
-export function Sidebar({ files, selectedFile, onSelectFile, onDeleteFile, onAddFile }) {
-  const treeRef = useRef(null)
+export function Sidebar({ files, selectedFile, onSelectFile, onDeleteFile, onAddFile, isOpen, onClose }) {
   const [showAddDialog, setShowAddDialog] = useState(false)
 
-  // Build tree structure with delete handler and selection state attached
-  const treeData = useMemo(() => {
-    const tree = buildFileTree(files)
+  const groups = useMemo(() => groupByDir(files), [files])
 
-    // Attach delete handler and selection state to each node
-    const attachData = (nodes) => {
-      nodes.forEach(node => {
-        node.onDelete = onDeleteFile
-        node.isSelected = !node.isDirectory && node.id === selectedFile
-        if (node.children) {
-          attachData(node.children)
-        }
-      })
-    }
-    attachData(tree)
+  const handleSelect = useCallback((path) => {
+    onSelectFile(path)
+    onClose()
+  }, [onSelectFile, onClose])
 
-    return tree
-  }, [files, onDeleteFile, selectedFile])
-
-  // Handle selection - only update if a file is selected, maintain current selection otherwise
-  const handleSelect = (nodes) => {
-    if (nodes.length > 0) {
-      const node = nodes[0]
-      if (!node.data.isDirectory) {
-        onSelectFile(node.id)
-      }
-    }
-    // Don't deselect if clicking outside - keep the current selection
-  }
-
-  // Extract existing directories for suggestions
   const existingDirs = useMemo(() => {
     const dirs = new Set()
     Object.keys(files).forEach(path => {
       const dir = getDirectory(path)
       if (dir) {
-        // Add all parent directories
         const parts = dir.split('/')
         let current = ''
         parts.forEach(part => {
@@ -102,54 +40,106 @@ export function Sidebar({ files, selectedFile, onSelectFile, onDeleteFile, onAdd
     return Array.from(dirs).sort()
   }, [files])
 
-  // Handle file addition with path
-  const handleAddFile = (file, targetPath) => {
+  const handleAddFile = useCallback((file, targetPath) => {
+    if (file === null) {
+      // Create empty editable file
+      onAddFile(targetPath, '', false)
+      return
+    }
     const reader = new FileReader()
     reader.onload = () => {
-      const isBinary = isBinaryFile(file.name)
-      if (isBinary) {
-        // Convert to base64 for binary files
-        const base64 = reader.result.split(',')[1]
-        onAddFile(targetPath, base64, true)
+      if (isBinaryFile(file.name)) {
+        onAddFile(targetPath, reader.result.split(',')[1], true)
       } else {
         onAddFile(targetPath, reader.result, false)
       }
     }
-
     if (isBinaryFile(file.name)) {
       reader.readAsDataURL(file)
     } else {
       reader.readAsText(file)
     }
-  }
+  }, [onAddFile])
 
   return (
-    <aside className="w-64 border-r border-surface-200 bg-surface-50 shadow-elevation-1 flex flex-col h-full">
-      <div className="flex-1 overflow-auto p-2">
-        <Tree
-          ref={treeRef}
-          data={treeData}
-          selection={selectedFile}
-          onSelect={handleSelect}
-          openByDefault={true}
-          width="100%"
-          height={600}
-          indent={16}
-          rowHeight={40}
-          overscanCount={5}
-        >
-          {TreeNode}
-        </Tree>
-      </div>
+    <>
+      {/* Mobile backdrop */}
+      {isOpen && (
+        <div
+          aria-hidden="true"
+          className="md:hidden fixed inset-0 z-30 bg-black/30"
+          onClick={onClose}
+        />
+      )}
 
-      <div className="p-3 border-t border-surface-200 bg-surface-0">
-        <button
-          onClick={() => setShowAddDialog(true)}
-          className="w-full flex items-center justify-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium text-surface-700 hover:bg-surface-100 hover:text-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 active:bg-surface-200 transition-all duration-200"
-        >
-          <span>+ Add file</span>
-        </button>
-      </div>
+      <aside
+        className={`
+          border-r border-surface-200 bg-surface-50 flex flex-col
+          fixed inset-y-0 left-0 z-40 w-72 shadow-elevation-4
+          transition-transform duration-200
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+          md:relative md:translate-x-0 md:w-64 md:shadow-elevation-1 md:z-auto
+        `}
+      >
+        <nav aria-label={MESSAGES.FILES_NAV} className="flex-1 overflow-y-auto p-2 min-h-0">
+          {Object.entries(groups).map(([dir, paths]) => (
+            <div key={dir || '__root__'} className="mb-1">
+              {dir && (
+                <p className="px-2 pt-3 pb-1 text-xs font-semibold uppercase tracking-wider text-surface-700 select-none truncate">
+                  {dir}
+                </p>
+              )}
+              {paths.map(path => {
+                const canDelete = !isSkillMd(path)
+                const isSelected = path === selectedFile
+                return (
+                  <div
+                    key={path}
+                    role="button"
+                    tabIndex={0}
+                    aria-current={isSelected ? 'true' : undefined}
+                    onClick={() => handleSelect(path)}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSelect(path) } }}
+                    className={`
+                      group flex items-center justify-between px-2 h-9 my-0.5 rounded-md cursor-pointer transition-all duration-150
+                      ${isSelected ? 'bg-primary-50 text-primary-700 shadow-elevation-1' : 'hover:bg-surface-100'}
+                    `}
+                  >
+                    <span className="truncate text-sm text-surface-900">{getFileName(path)}</span>
+                    {canDelete ? (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); onDeleteFile(path) }}
+                        aria-label={MESSAGES.DELETE_FILE_ARIA}
+                        className="w-8 h-8 flex items-center justify-center flex-shrink-0 rounded opacity-0 group-hover:opacity-60 hover:!opacity-100 hover:bg-danger-50 hover:text-danger-600 focus:outline-none focus:ring-2 focus:ring-danger-600 focus:opacity-100 transition-all duration-150"
+                      >
+                        <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                          stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="3 6 5 6 21 6" />
+                          <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
+                          <path d="M10 11v6M14 11v6M9 6V4h6v2" />
+                        </svg>
+                      </button>
+                    ) : (
+                      <span className="w-8 flex-shrink-0" aria-hidden="true" />
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          ))}
+        </nav>
+
+        <div className="p-3 border-t border-surface-200 bg-surface-0">
+          <button
+            onClick={() => setShowAddDialog(true)}
+            className="w-full flex items-center justify-center gap-2 px-3 min-h-[44px] rounded-md text-sm font-medium text-surface-700 hover:bg-surface-100 hover:text-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 active:bg-surface-200 transition-all duration-200"
+          >
+            <span aria-hidden="true">+</span>
+            <span>{MESSAGES.ADD_FILE}</span>
+          </button>
+        </div>
+
+      </aside>
 
       <AddFileDialog
         isOpen={showAddDialog}
@@ -157,6 +147,7 @@ export function Sidebar({ files, selectedFile, onSelectFile, onDeleteFile, onAdd
         onAdd={handleAddFile}
         existingDirs={existingDirs}
       />
-    </aside>
+    </>
   )
 }
+

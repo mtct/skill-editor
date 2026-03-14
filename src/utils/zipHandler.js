@@ -81,7 +81,6 @@ export async function loadSkillFile(file) {
 
     return { files, error: null }
   } catch (err) {
-    console.error('Error loading skill file:', err)
     return { files: null, error: MESSAGES.ERROR_NOT_ZIP }
   }
 }

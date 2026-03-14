@@ -114,53 +114,8 @@ export function isSkillMd(path) {
  */
 export function sortFiles(files) {
   return [...files].sort((a, b) => {
-    const aIsSkill = isSkillMd(a)
-    const bIsSkill = isSkillMd(b)
-
-    if (aIsSkill && !bIsSkill) return -1
-    if (!aIsSkill && bIsSkill) return 1
-
+    if (isSkillMd(a) && !isSkillMd(b)) return -1
+    if (!isSkillMd(a) && isSkillMd(b)) return 1
     return a.localeCompare(b)
   })
-}
-
-/**
- * Build tree structure from flat file list
- */
-export function buildFileTree(files) {
-  const tree = []
-  const map = {}
-
-  // Sort files first
-  const sortedPaths = sortFiles(Object.keys(files))
-
-  sortedPaths.forEach(path => {
-    const parts = path.split('/')
-    let currentLevel = tree
-    let currentPath = ''
-
-    parts.forEach((part, index) => {
-      currentPath = currentPath ? `${currentPath}/${part}` : part
-      const isFile = index === parts.length - 1
-
-      let existing = map[currentPath]
-
-      if (!existing) {
-        existing = {
-          id: currentPath,
-          name: part,
-          isDirectory: !isFile,
-          children: isFile ? undefined : [],
-        }
-        map[currentPath] = existing
-        currentLevel.push(existing)
-      }
-
-      if (!isFile) {
-        currentLevel = existing.children
-      }
-    })
-  })
-
-  return tree
 }

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo, useState } from 'react'
+import { useEffect, useRef, useMemo, useState, useCallback } from 'react'
 import { EditorView, keymap, lineNumbers, highlightActiveLine } from '@codemirror/view'
 import { EditorState } from '@codemirror/state'
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
@@ -30,6 +30,18 @@ export function EditorPanel({ filePath, content, isBinary, onChange }) {
   const containerRef = useRef(null)
   const viewRef = useRef(null)
   const [pdfBlobUrl, setPdfBlobUrl] = useState(null)
+
+  // One-time SKILL.md hint (dismissed state persisted in localStorage)
+  const [hintDismissed, setHintDismissed] = useState(
+    () => localStorage.getItem('skill-editor-skillmd-hint') === '1'
+  )
+  const dismissHint = useCallback(() => {
+    localStorage.setItem('skill-editor-skillmd-hint', '1')
+    setHintDismissed(true)
+  }, [])
+
+  const isSkillMdFile = filePath === 'SKILL.md'
+  const showSkillMdHint = isSkillMdFile && !hintDismissed
 
   // Determine language from file path
   const language = useMemo(() => {
@@ -92,27 +104,62 @@ export function EditorPanel({ filePath, content, isBinary, onChange }) {
           '&': {
             height: '100%',
             fontSize: '14px',
-            backgroundColor: '#FFFFFF',
+            backgroundColor: 'var(--color-surface-0)',
+            color: 'var(--color-surface-900)',
+          },
+          '&.cm-focused': {
+            outline: 'none',
+          },
+          '.cm-gutters': {
+            backgroundColor: 'var(--color-surface-50)',
+            color: 'var(--color-surface-700)',
+            borderRight: '1px solid var(--color-surface-200)',
+          },
+          '.cm-lineNumbers .cm-gutterElement': {
+            color: 'var(--color-surface-700)',
+          },
+          '.cm-activeLineGutter': {
+            backgroundColor: 'var(--color-surface-100)',
+          },
+          '.cm-foldPlaceholder': {
+            backgroundColor: 'var(--color-surface-200)',
+            color: 'var(--color-surface-900)',
+          },
+          '.cm-tooltip': {
+            backgroundColor: 'var(--color-surface-100)',
+            border: '1px solid var(--color-surface-200)',
+            color: 'var(--color-surface-900)',
+          },
+          '.cm-panels': {
+            backgroundColor: 'var(--color-surface-50)',
+            color: 'var(--color-surface-900)',
+          },
+          '.cm-searchMatch': {
+            backgroundColor: 'var(--color-primary-50)',
+            outline: '1px solid var(--color-primary-500)',
+          },
+          '.cm-selectionMatch': {
+            backgroundColor: 'var(--color-primary-50)',
           },
           '.cm-scroller': {
             overflow: 'auto',
-            fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
+            fontFamily: '"Geist Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
           },
           '.cm-content': {
             padding: '16px 0',
-            caretColor: '#2196F3',
+            caretColor: 'var(--color-primary-500)',
           },
           '.cm-line': {
             padding: '0 16px',
           },
           '.cm-activeLine': {
-            backgroundColor: '#FAFAFA',
+            backgroundColor: 'var(--color-surface-50)',
           },
           '.cm-selectionBackground': {
-            backgroundColor: '#E3F2FD !important',
+            backgroundColor: 'var(--color-primary-50) !important',
           },
           '.cm-cursor': {
-            borderLeftColor: '#2196F3',
+            borderLeftColor: 'var(--color-primary-500)',
           },
         }),
       ],
@@ -151,8 +198,15 @@ export function EditorPanel({ filePath, content, isBinary, onChange }) {
   // No file selected
   if (!filePath) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-surface-50 text-surface-700 text-base">
-        Select a file from the sidebar
+      <div className="flex-1 flex flex-col items-center justify-center bg-surface-50 gap-3 p-8 text-center">
+        {/* Arrow pointing left toward sidebar */}
+        <svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+          className="text-surface-200 -scale-x-100">
+          <path d="M5 12h14M12 5l7 7-7 7" />
+        </svg>
+        <p className="font-semibold text-surface-900 text-sm">{MESSAGES.EMPTY_STATE_TITLE}</p>
+        <p className="text-xs text-surface-700 max-w-[22ch] leading-relaxed">{MESSAGES.EMPTY_STATE_DESC}</p>
       </div>
     )
   }
@@ -204,8 +258,13 @@ export function EditorPanel({ filePath, content, isBinary, onChange }) {
         <div className="px-4 py-3 border-b border-surface-200 bg-surface-0">
           <span className="font-semibold text-base text-surface-900">{fileName}</span>
         </div>
-        <div className="flex-1 flex flex-col items-center justify-center gap-4 text-surface-700">
-          <span className="text-6xl">📄</span>
+        <div className="flex-1 flex flex-col items-center justify-center gap-3 text-surface-700">
+          <svg aria-hidden="true" width="40" height="40" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+            className="text-surface-200">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+          </svg>
           <span className="text-sm text-surface-700">{MESSAGES.BINARY_FILE}</span>
         </div>
       </div>
@@ -217,6 +276,22 @@ export function EditorPanel({ filePath, content, isBinary, onChange }) {
 
   return (
     <div className="flex-1 flex flex-col bg-surface-50">
+      {/* One-time SKILL.md hint banner */}
+      {showSkillMdHint && (
+        <div role="note" className="flex items-start gap-3 px-4 py-3 bg-primary-50 border-b border-primary-500/20 text-sm">
+          <svg aria-hidden="true" width="16" height="16" viewBox="0 0 20 20" fill="currentColor"
+            className="text-primary-500 flex-shrink-0 mt-0.5">
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clipRule="evenodd" />
+          </svg>
+          <span className="flex-1 text-primary-700">{MESSAGES.SKILLMD_HINT}</span>
+          <button
+            onClick={dismissHint}
+            className="flex-shrink-0 text-xs font-semibold text-primary-500 hover:text-primary-700 underline underline-offset-2 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded transition-colors"
+          >
+            {MESSAGES.SKILLMD_HINT_DISMISS}
+          </button>
+        </div>
+      )}
       <div className="px-4 py-3 border-b border-surface-200 bg-surface-0">
         <span className="font-semibold text-base text-surface-900">{fileName}</span>
       </div>
