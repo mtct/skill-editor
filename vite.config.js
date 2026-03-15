@@ -20,7 +20,7 @@ export default defineConfig({
             '@codemirror/lang-python',
             '@codemirror/lang-javascript',
           ],
-          vendor: ['jszip', 'js-yaml', 'react-arborist'],
+          vendor: ['jszip', 'js-yaml'],
         },
       },
     },
